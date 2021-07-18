@@ -22,28 +22,107 @@ function ProfileSidebar(propriedades) {
   )
 }
 
+function ProfileRelationsBox(propriedades) {
+  return (
+    <ProfileRelationsBoxWrapper>
+      <h2 className="smallTitle">
+        {propriedades.title} ({propriedades.items.length})
+      </h2>
+      <ul>
+        {propriedades.items.map((itemAtual, indice) => {
+          if (indice <= 5) {
+            return (
+              <li key={itemAtual.id}> 
+                <a href={itemAtual.html_url}>
+                  <img src={itemAtual.avatar_url} />
+                  <span>{itemAtual.login}</span>
+                </a>
+              </li>
+            );
+          }          
+        })}
+      </ul>
+    </ProfileRelationsBoxWrapper>
+  )
+}
+
 export default function Home() {
   const usuarioAleatorio = 'paulovictordev';
-  const [comunidades, setComunidades] = React.useState([{
-    id: '123345', 
-    title: 'Eu odeio acordar cedo',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
-    link: 'https://www.orkut.br.com/MainCommunity?cmm=10000'
-  }]);
-
+  const [comunidades, setComunidades] = React.useState([
+    {
+    id: '000123', 
+    login: 'Eu odeio acordar cedo',
+    avatar_url: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
+    html_url: 'https://www.orkut.br.com/MainCommunity?cmm=10000'
+    },
+    {
+      id: '000124', 
+      login: 'Stack Overflow em Português',
+      avatar_url: 'https://mundohacker.net.br/wp-content/uploads/2019/05/stackoverflow-1.png',
+      html_url: 'https://pt.stackoverflow.com/'
+    },
+    {
+      id: '000125', 
+      login: 'Alura Cursos Online',
+      avatar_url: 'https://www.alura.com.br/assets/img/alura-share.1617727198.png',
+      html_url: 'https://www.alura.com.br/'
+    }
+  ]);
+  
   // const comunidades = ['Alurakut'];
   const pessoasFavoritas = [
-    'juunegreiros',
-    'omariosouto',
-    'peas',
-    'rafaballerini',
-    'marcobrunodev',
-    'felipefialho'
+    {
+      id: '000001', 
+      login: 'juunegreiros',
+      avatar_url: 'https://github.com/juunegreiros.png',
+      html_url: 'https://github.com/juunegreiros'
+    },
+    {
+      id: '000002', 
+      login: 'omariosouto',
+      avatar_url: 'https://github.com/omariosouto.png',
+      html_url: 'https://github.com/omariosouto'
+    },
+    {
+      id: '000003', 
+      login: 'peas',
+      avatar_url: 'https://github.com/peas.png',
+      html_url: 'https://github.com/peas'
+    },
+    {
+      id: '000004', 
+      login: 'marcobrunodev',
+      avatar_url: 'https://github.com/marcobrunodev.png',
+      html_url: 'https://github.com/marcobrunodev'
+    },
+    {
+      id: '000005', 
+      login: 'rafaballerini',
+      avatar_url: 'https://github.com/rafaballerini.png',
+      html_url: 'https://github.com/rafaballerini'
+    },
+    {
+      id: '000006', 
+      login: 'rafaballerini',
+      avatar_url: 'https://github.com/felipefialho.png',
+      html_url: 'https://github.com/felipefialho'
+    }
   ]
+  const [seguidores, setSeguidores] = React.useState([]);
+  // 0 - Pegar o array de dados do github 
+  React.useEffect(function() {
+    fetch(`https://api.github.com/users/${usuarioAleatorio}/followers`)
+    .then(function (respostaDoServidor) {
+      return respostaDoServidor.json();
+    })
+    .then(function(respostaCompleta) {
+      setSeguidores(respostaCompleta);
+    })
+  }, []);
 
   return (
     <>
-      <AlurakutMenu githubUser={usuarioAleatorio} />
+      <AlurakutMenu />
       <MainGrid>
         {/* <Box style="grid-area: profileArea;"> */}
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
@@ -68,13 +147,9 @@ export default function Home() {
                   id: new Date().toISOString(),
                   title: dadosDoForm.get('title'),
                   image: dadosDoForm.get('image'),
-                  link: dadosDoForm.get('link')
                 }
                 const comunidadesAtualizadas = [...comunidades, comunidade];
                 setComunidades(comunidadesAtualizadas);
-
-                console.log(e.target)
-
             }}>
               <div>
                 <input
@@ -98,7 +173,7 @@ export default function Home() {
                   aria-label="Qual é o link de acesso pra comunidade"
                 />
               </div>
-
+              
               <button>
                 Criar comunidade
               </button>
@@ -106,41 +181,9 @@ export default function Home() {
           </Box>
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle">
-              Comunidades ({comunidades.length})
-            </h2>
-            <ul>
-              {comunidades.map((itemAtual) => {
-                return (
-                  <li key={itemAtual.id}>
-                    <a href={itemAtual.link} target="_blank">
-                      <img src={itemAtual.image} />
-                      <span>{itemAtual.title}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle">
-              Pessoas da comunidade ({pessoasFavoritas.length})
-            </h2>
-
-            <ul>
-              {pessoasFavoritas.map((itemAtual) => {
-                return (
-                  <li key={itemAtual}>
-                    <a href={`/users/${itemAtual}`}>
-                      <img src={`https://github.com/${itemAtual}.png`} />
-                      <span>{itemAtual}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBox title="Seguidores" items={seguidores} />
+          <ProfileRelationsBox title="Comunidades" items={comunidades}/>
+          <ProfileRelationsBox title="Pessoas da comunidade" items={pessoasFavoritas}/>
         </div>
       </MainGrid>
     </>
